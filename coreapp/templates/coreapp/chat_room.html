@@ -1,0 +1,120 @@
+{% extends 'coreapp/base.html' %} {% load static %} {% block body %}
+<div class="container">
+  <h1 class="text-center" style="margin: 2rem; color: #92daec">{{croom.name}}</h1>
+
+  <form class="main-search-input-wrap">
+    <div class="main-search-input fl-wrap">
+      <div class="main-search-input-item">
+        <input type="text" name="message" id="msg" placeholder="Type something..." />
+      </div>
+
+      <button class="main-search-button" type="submit" id="snd" onclick="handleSend(event)">Send <i class="fa-regular fa-circle-right ms-1"></i></button>
+    </div>
+  </form>
+
+  <div class="position-relative">
+    <div class="chat-messages p-4" id="chat-msgs">
+      {% for msg in chat_messages %} 
+      {% if msg.author.username == user.username %}
+      <div class="chat-message-right pb-4">
+        <div class="text-center">
+          <img src="{{ msg.author.userprofile.profile_pic.url }}" class="rounded-circle" alt="profile-pic" width="40" height="40" />
+          <div class="small mt-1" style="max-width: 60px">{{msg.str_time}}</div>
+        </div>
+        <div class="flex-shrink-1 bubble rounded py-2 px-3 me-2">
+          <div class="chat-name mb-1">{{msg.author.username}}</div>
+          {{msg.message}}
+        </div>
+      </div>
+
+      {% else %}
+      <div class="chat-message-left pb-4">
+        <div class="text-center">
+          <img src="{{ msg.author.userprofile.profile_pic.url }}" class="rounded-circle" alt="profile-pic" width="40" height="40" />
+          <div class="small mt-1" style="max-width: 60px">{{msg.str_time}}</div>
+        </div>
+        <div class="flex-shrink-1 bubble rounded py-2 px-3 ms-2">
+          <div class="chat-name mb-1">{{msg.author.username}}</div>
+          {{msg.message}}
+        </div>
+      </div>
+
+      {% endif %} {% endfor %}
+    </div>
+  </div>
+</div>
+
+{{croom.slug|json_script:"room-slug"}} 
+{{user.username|json_script:"user-name"}}
+
+<script>
+  const croom = JSON.parse(document.getElementById("room-slug").textContent);
+  const curr_username = JSON.parse(document.getElementById("user-name").textContent);
+  const is_authenticated = JSON.parse(document.getElementById("auth-status").textContent);
+
+  const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/" + croom + "/");
+  chatSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    const message = data['message'];
+    const username = data['username'];
+    const profilePic = data['profile_pic'];
+    const timestamp = data['timestamp'];
+    
+    let html = "";
+
+    if (username === curr_username) {
+      html = `
+            <div class="chat-message-right pb-4">
+                <div class="text-center">
+                    <img src="${profilePic}" class="rounded-circle" alt="profile-pic" width="40" height="40">
+                    <div class="small mt-1" style="max-width: 60px;">${timestamp}</div>
+                </div>
+                <div class="flex-shrink-1 bubble rounded py-2 px-3 me-2">
+                    <div class="chat-name mb-1">${username}</div>
+                    ${message}
+                </div>
+            </div>
+        `;
+    } else {
+      html = `
+            <div class="chat-message-left pb-4">
+                <div class="text-center">
+                    <img src="${profilePic}" class="rounded-circle" alt="profile-pic" width="40" height="40">
+                    <div class="small mt-1" style="max-width: 60px;">${timestamp}</div>
+                </div>
+                <div class="flex-shrink-1 bubble rounded py-2 px-3 ms-2">
+                    <div class="chat-name mb-1">${username}</div>
+                    ${message}
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById("chat-msgs").innerHTML = html + document.getElementById("chat-msgs").innerHTML;
+  };
+  chatSocket.onclose = function (e) {
+    showAlert('Chat disconnected', 'warning');
+    
+    console.log("disconnected");
+  };
+
+  const handleSend = (e) => {
+    if (!is_authenticated) {
+      showAlert('Please log in to send messages !', 'warning');
+      return;
+    }
+    e.preventDefault();
+    const msg = document.getElementById("msg");
+    const msg_value = msg.value;
+    msg.value = "";
+    chatSocket.send(
+      JSON.stringify({
+        message: msg_value,
+        datetime: "now",
+        room: croom,
+      })
+    );
+  };
+</script>
+
+{% endblock %}

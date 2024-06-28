@@ -1,0 +1,24 @@
+{% extends 'user/baseform.html' %}
+{% load static %} 
+{% block body %}
+
+<div class="loginBox" style="padding-top: 30px; padding-bottom: 30px">
+  <img class="user" src="{% static 'user/img/formpic.png'%}" height="100px" width="100px" />
+  <h3>Login Form</h3>
+  <form method="post">
+    {% csrf_token %}
+    <div class="inputBox">
+      {% for field in form %} 
+      <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" placeholder="{{ field.name }}" required>
+
+      {% endfor %}
+    </div>
+    <button type="submit">Log In</button>
+  </form>
+
+  <div class="text-center">
+    <p>Not Registered..<br /></p>
+    <a href="{% url 'user:signup' %}">SignUp</a>
+  </div>
+</div>
+{% endblock %}

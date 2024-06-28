@@ -1,0 +1,89 @@
+{% extends 'coreapp/base.html' %} {% load static %} {% block body %}
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/profile.css' %}" />
+<div class="container py-4">
+  <h1 class="h1 text-center" id="pageHeaderTitle">Update Profile</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row gutters">
+      <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12 mb-3">
+        <div class="card h-100">
+          <div class="card-body ">
+            <div class="account-settings">
+              <div class="user-profile">
+                <div class="user-avatar">
+                  <label style="cursor: pointer;">
+                    <img src="{{user.userprofile.profile_pic.url}}" alt="profile pic" id="up-pic" />
+                    <input type="file" name="profile_pic" accept="image/*" id="id_profile_pic" onchange="fileUpload(event)" style="display: none;">
+                  </label>
+                  
+                </div>
+                <h5 class="user-name">{{user.username}}</h5>
+                <h6 class="user-email">{{user.email}}</h6>
+              </div>
+              <div class="about">
+                <h5 class="mb-2 text-primary">About</h5>
+                <div class="form-group" style="padding: 0; margin:0">{{form.about}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="row gutters">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <h6 class="mb-3 text-primary">Personal Details</h6>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="form-group">
+                  <label for="id_name">Full Name</label>
+                  {{form.name}}
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="form-group">
+                  <label for="id_phone">Phone Number</label>
+                  {{form.phone}}
+                </div>
+              </div>
+            </div>
+            <div class="row gutters mt-4" >
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <h6 class="mb-3 text-primary">Address</h6>
+              </div>
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="form-group">
+                  <label for="id_address">Full Address</label>
+                  {{form.address}}
+                </div>
+              </div>
+            </div>
+            <div class="row gutters mt-4">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                <div class="text-right">
+                  <button type="submit" class="btn btn-primary mt-3" ><i class="fa-solid fa-pen-to-square me-2"></i>Update</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  const fileUpload = (event) => {
+      const files = event.target.files;
+      const filesLength = files.length;
+      if (filesLength > 0) {
+        const imageSrc = URL.createObjectURL(files[0]);
+        const imagePreviewElement = document.querySelector("#up-pic");
+        imagePreviewElement.src = imageSrc;
+        imagePreviewElement.style.display = "block";
+      }
+    };
+</script>
+
+{% endblock %}

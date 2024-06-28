@@ -1,0 +1,23 @@
+{% extends 'coreapp/base.html' %} {% load static %} {% block body %}
+<div class="container">
+    <h1 class="text-center" style="margin: 4rem;color: #92daec">Chat Rooms</h1>
+    {% if not crooms %} <h2 class="text-center"> No Active Chatroom !</h2>
+    {% else %} {% for room in crooms %} 
+
+    <article class="postcard dark green">
+        <div class="postcard__text">
+            <a href="{% url 'coreapp:room' room.slug %}"><h1 class="postcard__title green">{{room.name}}</h1></a>
+            <div class="postcard__bar"></div>
+            <div class="postcard__preview-txt">{{room.desc}}</div>
+            <ul class="postcard__tagbox">
+                <li class="tag__item play green">
+                    <a href="{% url 'coreapp:room' room.slug %}">Join<i class="fa-solid fa-play ms-2"></i></a>
+                </li>
+            </ul>
+        </div>
+    </article>
+
+    {% endfor %} {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,5 @@
+asgiref==3.7.2
+channels==4.1.0
+Django==4.2.5
+django-autoslug==1.9.9
+pillow==10.3.0
